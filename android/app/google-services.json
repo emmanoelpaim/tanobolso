@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "68746602091",
+    "firebase_url": "https://tanobolso-7c1fe.firebaseio.com",
+    "project_id": "tanobolso-7c1fe",
+    "storage_bucket": "tanobolso-7c1fe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:68746602091:android:ffd462ed2f8005d38e732e",
+        "android_client_info": {
+          "package_name": "br.com.emmanoelpaim.tanobolso"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "68746602091-ricml7sflqugflq5n0kpgtef0fdn2r3g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzxioVna5G4IMspB1j2G3cp3t0I5edxuw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "68746602091-ricml7sflqugflq5n0kpgtef0fdn2r3g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
