@@ -16,16 +16,11 @@ class UserPerfilScreen extends StatefulWidget {
 }
 
 class _UserPerfilScreenState extends State<UserPerfilScreen> {
-  var telMask = new MaskTextInputFormatter(
-      mask: '(##) #####-####', filter: {"#": RegExp(r'[0-9]')});
 
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final _nameController = TextEditingController();
-  final _cpfController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _cellphoneController = TextEditingController();
 
   bool _isLoading = false;
   Auth _firebaseAuth = Auth();
@@ -41,9 +36,6 @@ class _UserPerfilScreenState extends State<UserPerfilScreen> {
       Map<String, dynamic> mapData = (value as DocumentSnapshot).data;
       setState(() {
         _nameController.text = mapData['name'];
-        _cpfController.text = mapData['cpf'];
-        _phoneController.text = mapData['phone'];
-        _cellphoneController.text = mapData['cellphone'];
       });
     });
   }
@@ -75,56 +67,6 @@ class _UserPerfilScreenState extends State<UserPerfilScreen> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10,5,10,3),
-                child: TextFormField(
-                  keyboardType: TextInputType.text,
-                  controller: _cpfController,
-                  validator: (text) {
-                    if (text.isEmpty) {
-                      return "cpf inválido";
-                    }
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'CPF',
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10,5,10,3),
-                child: TextFormField(
-                  keyboardType: TextInputType.text,
-                  controller: _phoneController,
-                  inputFormatters: [telMask],
-                  validator: (text) {
-                    if (text.isEmpty) {
-                      return "Telefone inválido";
-                    }
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Telefone',
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10,5,10,3),
-                child: TextFormField(
-                  keyboardType: TextInputType.text,
-                  controller: _cellphoneController,
-                  inputFormatters: [telMask],
-                  validator: (text) {
-                    if (text.isEmpty) {
-                      return "Celular inválido";
-                    }
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Celular (WhatsApp, contato náutico)',
-                  ),
-                ),
-              ),
               SizedBox(
                 height: 10,
               ),
@@ -146,9 +88,6 @@ class _UserPerfilScreenState extends State<UserPerfilScreen> {
                       DocumentSnapshot dynamicUserModel = await _firebaseAuth.getCurrentUserModel(widget.userId);
                       Map<String, dynamic> userData = dynamicUserModel.data;
                       userData["name"] = _nameController.text;
-                      userData["cpf"] = _cpfController.text;
-                      userData["phone"] = _phoneController.text;
-                      userData["cellphone"] = _cellphoneController.text;
 
                       await _firebaseAuth.editUser(userData,widget.userId).then((result){
                         _onSuccess();

@@ -1,8 +1,5 @@
-import 'package:tanobolso/models/history_trip.dart';
 import 'package:tanobolso/models/service.dart';
 import 'package:tanobolso/models/user.dart';
-import 'package:tanobolso/screens/calendar.dart';
-import 'package:tanobolso/screens/card.dart';
 import 'package:tanobolso/screens/card_list.dart';
 import 'package:tanobolso/screens/user_address.dart';
 import 'package:tanobolso/screens/user_perfil.dart';
@@ -10,8 +7,6 @@ import 'package:tanobolso/services/authentication.dart';
 import 'package:tanobolso/services/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_file.dart';
-import 'package:intl/intl.dart';
 
 
 
@@ -69,42 +64,42 @@ class _HomeScreenState extends State<HomeScreen>  with SingleTickerProviderState
     loadServices();
   }
 
+  void loadSchedules() {
+//    String dateParameter = DateFormat.yMd("ptBR").format(DateTime.now());
+//    DateTime dateFilter = DateTime.now();
+//    var newValue = 0;
+//    dateFilter = dateFilter.toLocal();
+//   dateFilter = new DateTime(
+//        dateFilter.year,
+//        dateFilter.month,
+//        dateFilter.day,
+//        newValue, newValue, newValue, newValue, newValue);
+//    print(dateFilter);
+//    widget.auth.getSchedulesListByUser(dateFilter, widget.userId).then((value) {
+//      List<DocumentSnapshot> schedulesDocuments = (value as QuerySnapshot).documents;
+//      setState(() {
+//        schedulesList.clear();
+//        schedulesDocuments.forEach((element) {
+//          schedulesList[element.documentID] = element.data;
+//        });
+//      });
+//      print (schedulesList);
+//    });
+  }
+
   void loadServices() {
-//    print("teste");
-//    print(serviceList);
     widget.auth.getServicesList().then((value) {
       List<DocumentSnapshot> servicesDocuments = (value as QuerySnapshot).documents;
-//      print(servicesDocuments);
+      print(servicesDocuments);
       serviceList.clear();
       servicesDocuments.forEach((element) {
         serviceList[element.documentID] = element.data;
-//        print(element.data);
+        print(element.data);
       });
-    });
+  });
   }
 
-  void loadSchedules() {
-//    String dateParameter = DateFormat.yMd("ptBR").format(DateTime.now());
-    DateTime dateFilter = DateTime.now();
-    var newValue = 0;
-    dateFilter = dateFilter.toLocal();
-    dateFilter = new DateTime(
-        dateFilter.year,
-        dateFilter.month,
-        dateFilter.day,
-        newValue, newValue, newValue, newValue, newValue);
-    print(dateFilter);
-    widget.auth.getSchedulesListByUser(dateFilter, widget.userId).then((value) {
-      List<DocumentSnapshot> schedulesDocuments = (value as QuerySnapshot).documents;
-      setState(() {
-        schedulesList.clear();
-        schedulesDocuments.forEach((element) {
-          schedulesList[element.documentID] = element.data;
-        });
-      });
-//      print (schedulesList);
-    });
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -236,8 +231,6 @@ class _HomeScreenState extends State<HomeScreen>  with SingleTickerProviderState
                     child: Column(
                       children: <Widget>[
                         getInformacoesPessoaisItem(),
-                        getCartoesItem(),
-                        getEnderecoCobrancaItem(),
                         getSairItem(),
                       ],
                     ),
@@ -273,17 +266,7 @@ class _HomeScreenState extends State<HomeScreen>  with SingleTickerProviderState
               children: <Widget>[
                 Card(
                   child: ListTile(
-                      onTap: () {
-                        Navigator.push(
-                            context, MaterialPageRoute(builder: (context) => CalendarScreen(title:"Agenda", auth: _firebaseAuth, userId: widget.userId, serviceModelItem: serviceModel, serviceId: getKeyFromIndex(index))))
-                            .then((value) {
-                          if (value != null) {
-                            value ? _onSuccessCustomMessage("Agendamento realizado com sucesso!") : _onFailMessage();
-                          }
-                          loadSchedules();
-                          loadServices();
-                        });
-                      },
+                      onTap: () {},
                       title: Text(serviceModel.name),
                       subtitle: Text(serviceModel.description),
                       trailing: Column(

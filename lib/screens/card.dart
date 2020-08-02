@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:tanobolso/services/authentication.dart';
-import 'package:tanobolso/services/retrofit.dart';
 import 'package:tanobolso/ui/widgets/profile_tile.dart';
 import 'package:tanobolso/utils/uidata.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -309,66 +308,7 @@ class _CardScreenState extends State<CardScreen> {
           color: Colors.blueAccent,
           child: const Text('Salvar',
               style: TextStyle(color: Colors.white, fontSize: 20)),
-          onPressed: () async{
-            if (_formKey.currentState.validate()) {
-              Map<String, dynamic> cardData = {
-                "numberCard": _numberCardController.text,
-                "expireCard": _expireCardController.text,
-                "cvvCard": _cvvCardController.text,
-                "holderCard": _holderCardController.text.toUpperCase().trim(),
-              };
-
-              setState(() {
-                _isLoading = true;
-              });
-
-              final dio = Dio();
-              dio.options.connectTimeout = 15000;
-              JsonTokenizationCard jsonCard = JsonTokenizationCard(JsonCard(cardData["holderCard"], cardData["numberCard"], cardData["expireCard"], cardData["cvvCard"]));
-              print(jsonCard.toJson());
-              final client = RestClient(dio);
-              client.postTokenizationCard(jsonCard).then((requestResponse) async {
-                try {
-                  dynamic jsonDecoded = json.decode(requestResponse);
-                  print(jsonDecoded);
-                  if (jsonDecoded['HasError'] != null) {
-                    if (jsonDecoded['HasError'] == true) {
-                      jsonDecoded['Error'] = jsonDecoded['Error'].toString().replaceAll("tokenização", "validação do cartão");
-                      showMessage(jsonDecoded['Error']);
-
-                      setState(() {
-                        _isLoading = false;
-                      });
-                    } else {
-                      Map<String, dynamic> cardToken = {
-                        "numberCard": _numberCardController.text.substring(_numberCardController.text.length - 4),
-                        "holderCard": _holderCardController.text.toUpperCase().trim(),
-                        "token": jsonDecoded['ResponseDetail']['Token']
-                      };
-                      await _firebaseAuth.saveUserCard(cardToken,widget.userId).then((result){
-                        _onSuccess();
-                      }).catchError((e){
-                        setState(() {
-                          _isLoading = false;
-                        });
-
-                        showMessage(e);
-                      });
-                    }
-                  }
-
-                } catch (e) {
-                  print(e.toString());
-                }
-              }).catchError((errorResponse) {
-                String response = errorResponse;
-                if (errorResponse.toString().contains("TIMEOUT")) {
-                  response = "Serviço indisponível!";
-                }
-                showMessage(response);
-              });
-            }
-          },
+          onPressed: () {}
         )
     );
   }

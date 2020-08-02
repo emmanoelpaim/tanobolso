@@ -1,40 +1,34 @@
-import 'dart:convert';
 import 'package:tanobolso/screens/root.dart';
 import 'package:tanobolso/services/authentication.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart' hide Headers;
-import 'home.dart';
 
 
-class RegisterScreen extends StatefulWidget {
-  RegisterScreen({this.auth, this.loginCallback});
+class ServiceAddScreen extends StatefulWidget {
+  ServiceAddScreen({this.auth, this.loginCallback,this.userId});
 
   final BaseAuth auth;
   final VoidCallback loginCallback;
+  final String userId;
 
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  _ServiceAddScreenState createState() => _ServiceAddScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
-
-  var isServiceProvider = false;
-  var isUser = false;
-
-  var _typePermission =['Selecione','Prestador de Serviços','Usuário'];
-  var _permissionSelect = 'Selecione';
-
+class _ServiceAddScreenState extends State<ServiceAddScreen> {
 
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passController = TextEditingController();
+  final _priceController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
+  var _turnList =['Selecione','Manhã','Tarde','Noite','Todo Dia'];
+  var _turnSelect = 'Selecione';
 
   bool _isLoading = true;
   Auth _firebaseAuth = Auth();
-  String userId = "";
 
   @override
   void initState() {
@@ -42,10 +36,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _isLoading = false;
   }
 
-  Widget getDropDownBtnTipoCadastro() {
+  Widget getDropDownBtnTurn() {
     return DropdownButton<String>(
         isExpanded: true,
-        items: _typePermission.map((String dropDownStringItem) {
+        items: _turnList.map((String dropDownStringItem) {
           return DropdownMenuItem<String>(
             value: dropDownStringItem,
             child: Text(dropDownStringItem),
@@ -53,19 +47,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }).toList(),
         onChanged: (String text) {
           setState(() {
-            this._permissionSelect = text;
+            this._turnSelect = text;
           });
         },
-        value: _permissionSelect
+        value: _turnSelect
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Cadastrar'),
+        title: Text('Cadastrar Serviço'),
         backgroundColor: Colors.blueAccent,
         centerTitle: false,
         leading: Builder(builder: (BuildContext context) {
@@ -99,73 +94,50 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       },
                       decoration: InputDecoration(
                         prefixIcon: const Icon(
-                          Icons.person,
+                          Icons.work,
                         ),
-                        labelText: 'Digite seu Nome',
+                        labelText: 'Digite nome serviço',
                       ),
                     ),
+
                     SizedBox(
                       height: 10.0,
                     ),
                     TextFormField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(
-                          Icons.mail,
-                        ),
-                        labelText: 'Digite seu Email',
-                      ),
+                      keyboardType: TextInputType.text,
+                      controller: _priceController,
                       validator: (text) {
                         if (text.isEmpty) {
-                          return "Email inválido";
+                          return "Preço inválido";
                         }
                       },
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(
+                          Icons.attach_money,
+                        ),
+                        labelText: 'Digite o preço serviço',
+                      ),
                     ),
                     SizedBox(
                       height: 10.0,
                     ),
                     TextFormField(
-                      controller: _passController,
-                      keyboardType: TextInputType.visiblePassword,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(
-                          Icons.lock,
-                        ),
-                        labelText: 'Digite sua Senha',
-                      ),
+                      keyboardType: TextInputType.text,
+                      controller: _descriptionController,
                       validator: (text) {
-                        if (text.isEmpty || text.length < 6) {
-                          return "Senha inválida";
+                        if (text.isEmpty) {
+                          return "Descrição inválido";
                         }
                       },
+                      decoration: InputDecoration(
+                        labelText: 'Digite descrição serviço',
+                      ),
                     ),
+
                     SizedBox(
                       height: 10.0,
                     ),
-                    Row(
-                      children: <Widget>[
-
-                        Text(
-                          'Tipo de Cadastro?',
-                          style: TextStyle(fontSize: 20.0),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: <Widget>[
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.91,
-                          child: getDropDownBtnTipoCadastro(),
-                        ),
-                      ],
-                    ),
-                    isUser ?
-                    Column(
-                      children: <Widget>[
-                      ],
-                    ) : Container(),
+                    getDropDownBtnTurn(),
                     SizedBox(
                       height: 10.0,
                     ),
@@ -175,32 +147,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           side: BorderSide(color: Colors.blueAccent)),
                       onPressed: () async{
                         if (_formKey.currentState.validate()) {
-                          Map<String, dynamic> userData = {
-                            "name": _nameController.text,
-                            "email": _emailController.text,
-                            "permissionSelect": _permissionSelect == "Selecione"
-                                ? ""
-                                : _permissionSelect,
+                          Map<String, dynamic> serviceData = {
+                            "id" :  DateTime.now().millisecondsSinceEpoch,
+                            "name" : _nameController.text,
+                            "price" : _priceController.text,
+                            "description" : _descriptionController.text,
+                            "turn" : _turnSelect == "Selecione"
+                                ? "" : _turnSelect,
+                            "user_create" : widget.userId,
+                            "date_create" : DateTime.now(),
+
                           };
 
                           setState(() {
                             _isLoading = true;
                           });
 
-                          await _firebaseAuth.signUp(
-                              _emailController.text, _passController.text)
-                              .then((result){
-                            setState(() {
-                              userId = result;
-                            });
-                          })
-                              .catchError((e){
-                            setState(() {
-                              _isLoading = false;
-                            });
-                            _onFail(e);
-                          });
-                          await _firebaseAuth.saveUser(userData).then((result){
+                          await _firebaseAuth.saveService(serviceData).then((result){
                             _onSuccess();
                           })
                               .catchError((e){
@@ -243,7 +206,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _onFail(message) {
     _scaffoldKey.currentState.showSnackBar(SnackBar(
-      content: Text("Falha ao criar usuário! \n $message"),
+      content: Text("Falha ao criar serviço! \n $message"),
       backgroundColor: Colors.redAccent,
       duration: Duration(seconds: 5),
     ));

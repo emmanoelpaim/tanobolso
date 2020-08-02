@@ -2,7 +2,6 @@ import 'package:tanobolso/models/user.dart';
 import 'package:tanobolso/screens/home.dart';
 import 'package:tanobolso/screens/login.dart';
 import 'package:tanobolso/screens/provider.dart';
-import 'package:tanobolso/screens/term.dart';
 import 'package:tanobolso/services/authentication.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -97,18 +96,8 @@ class _RootPageState extends State<RootPage> {
             });
           }).catchError((e)=> print("error fetching data: $e"));
 
-          widget.auth.getLastTerm().then((value) {
-            _lastTerm = value;
-          });
-//          print (_lastTerm);
-          if (_termModify != _lastTerm) {
-            return new TermScreen(
-              userId: _userId,
-              auth: widget.auth,
-              logoutCallback: logoutCallback,
-              urlTerm: _lastTerm,
-            );
-          } else if(_permissionSelect== "Prestador de Serviços"){
+
+           if(_permissionSelect == "Prestador de Serviços"){
             return new ProviderScreen(
               userId: _userId,
               auth: widget.auth,

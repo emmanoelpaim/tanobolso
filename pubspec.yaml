@@ -45,7 +45,6 @@ dependencies:
   flutter_masked_text: ^0.8.0
   font_awesome_flutter: ^8.8.1
   flutter_calendar_carousel: ^1.4.12
-  flutter_filereader: ^2.1.0
   path_provider: ^1.6.10
   permission_handler: ^4.0.0
   firebase_storage:

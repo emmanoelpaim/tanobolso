@@ -19,6 +19,7 @@ abstract class BaseAuth {
   Future<dynamic> getCurrentUserModel(String uid);
 
   Future<dynamic> getServicesList();
+  Future<dynamic> getServicesListByUid(String uid);
 
   Future<dynamic> getCardsFromCurrentUserModel(String uid);
 
@@ -30,7 +31,6 @@ abstract class BaseAuth {
 
   Future<dynamic> getSchedulesListByUser(DateTime date, String userId);
 
-  Future<String> getLastTerm();
 }
 
 class Auth implements BaseAuth {
@@ -44,24 +44,6 @@ class Auth implements BaseAuth {
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  Future<String> getLastTerm() async {
-    var documentsList = await FirebaseStorage.instance.ref().child('TermsOfUse');
-
-    int resultado = 0;
-    String resultadoURL = "";
-
-    Map<dynamic, dynamic> documentsMap = (await documentsList.listAll())["items"];
-    for (var item in documentsMap.keys) {
-      var documentRef = await FirebaseStorage.instance.ref().child('TermsOfUse/'+item).getMetadata();
-      String url = await FirebaseStorage.instance.ref().child('TermsOfUse/'+item).getDownloadURL();
-      if (documentRef.updatedTimeMillis > resultado) {
-        resultado = documentRef.updatedTimeMillis;
-        resultadoURL = url;
-      }
-    }
-
-    return resultadoURL;
-  }
 
   Future<dynamic> getSchedulesList(String date, String serviceId) async {
     String resultado = "";
@@ -95,9 +77,14 @@ class Auth implements BaseAuth {
 
   }
 
-  Future<dynamic> getCurrentUserModel(String uid) async {
-    String resultado = "";
+  Future<dynamic> getServicesListByUid(String uid) async {
+    var document = await Firestore.instance.collection('services').where("user_create",isEqualTo: uid).orderBy("name");
 
+    return document.getDocuments();
+
+  }
+
+  Future<dynamic> getCurrentUserModel(String uid) async {
     var document = await Firestore.instance.collection('users').document(uid);
 
     return document.get();
@@ -135,6 +122,15 @@ class Auth implements BaseAuth {
         .document(firebaseUser.uid)
         .setData(userData);
   }
+
+  Future<void> saveService(Map<String, dynamic> userData) async {
+    this.userData = userData;
+    await Firestore.instance
+        .collection("services")
+        .document()
+        .setData(userData);
+  }
+
 
   Future<void> editUser(Map<String, dynamic> userData, String userId) async {
     this.userData = userData;
